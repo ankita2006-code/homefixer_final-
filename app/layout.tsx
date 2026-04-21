@@ -121,11 +121,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       },
       { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
     );
-    
+
     const timer = setTimeout(() => {
       document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     }, 100);
-    
+
     return () => { clearTimeout(timer); observer.disconnect(); };
   }, [pathname]);
 
@@ -201,9 +201,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     }}
                   >
                     {link.label}
-                    <span 
+                    <span
                       className="absolute bottom-0 left-0 w-full h-[3px] rounded-t-md transition-transform duration-300 ease-out"
-                      style={{ 
+                      style={{
                         background: "var(--brand)",
                         transform: isActive ? "scaleX(1)" : "scaleX(0)",
                         transformOrigin: "center"
@@ -222,11 +222,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 className="p-2 transition-all duration-300"
                 title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                 style={{ color: "var(--muted)", background: "var(--surface)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)" }}
-                onMouseEnter={(e) => { 
+                onMouseEnter={(e) => {
                   (e.currentTarget as HTMLElement).style.color = "var(--brand)";
                   (e.currentTarget as HTMLElement).style.borderColor = "var(--brand)";
                 }}
-                onMouseLeave={(e) => { 
+                onMouseLeave={(e) => {
                   (e.currentTarget as HTMLElement).style.color = "var(--muted)";
                   (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
                 }}
@@ -381,7 +381,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           overflow: "hidden",
         }}
           className="pt-16 pb-8">
-          
+
           <div style={{
             position: "absolute", top: 0, left: 0, right: 0, height: 2,
             background: "linear-gradient(90deg, transparent, var(--brand) 30%, var(--gold) 50%, var(--brand) 70%, transparent)"
@@ -402,9 +402,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   Connecting Durgapur's residents with verified, background-checked local professionals.
                 </p>
                 <div className="flex gap-3 pt-1">
-                  {[Facebook, Instagram, Twitter].map((Icon, i) => (
-                    <button
+                  {[
+                    { Icon: Facebook, href: "#" },
+                    { Icon: Instagram, href: "https://www.instagram.com/home_fixer23/" },
+                    { Icon: Twitter, href: "https://x.com/Homefixer23/" }
+                  ].map(({ Icon, href }, i) => (
+                    <a
                       key={i}
+                      href={href}
+                      target={href !== "#" ? "_blank" : undefined}
+                      rel={href !== "#" ? "noopener noreferrer" : undefined}
                       className="w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-300"
                       style={{ borderColor: "var(--border)", color: "var(--muted)" }}
                       onMouseEnter={(e) => {
@@ -423,7 +430,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       }}
                     >
                       <Icon size={16} />
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -437,11 +444,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       <Link href={`/search?category=${s}`}
                         className="text-sm transition-all duration-250"
                         style={{ color: "var(--muted)", display: "inline-block" }}
-                        onMouseEnter={(e) => { 
+                        onMouseEnter={(e) => {
                           (e.currentTarget as HTMLElement).style.color = "var(--brand-mid)";
                           (e.currentTarget as HTMLElement).style.transform = "translateX(3px)";
                         }}
-                        onMouseLeave={(e) => { 
+                        onMouseLeave={(e) => {
                           (e.currentTarget as HTMLElement).style.color = "var(--muted)";
                           (e.currentTarget as HTMLElement).style.transform = "translateX(0)";
                         }}>
@@ -466,11 +473,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       <Link href={link.href}
                         className="text-sm transition-all duration-250"
                         style={{ color: "var(--muted)", display: "inline-block" }}
-                        onMouseEnter={(e) => { 
+                        onMouseEnter={(e) => {
                           (e.currentTarget as HTMLElement).style.color = "var(--brand-mid)";
                           (e.currentTarget as HTMLElement).style.transform = "translateX(3px)";
                         }}
-                        onMouseLeave={(e) => { 
+                        onMouseLeave={(e) => {
                           (e.currentTarget as HTMLElement).style.color = "var(--muted)";
                           (e.currentTarget as HTMLElement).style.transform = "translateX(0)";
                         }}>
@@ -495,7 +502,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <Mail size={16} className="shrink-0" style={{ color: "var(--brand)" }} />
-                    support@homefixer.in
+                    <a href="mailto:supporthomefixer@gmail.com" className="hover:underline transition-all">
+                      supporthomefixer@gmail.com
+                    </a>
                   </li>
                 </ul>
               </div>
