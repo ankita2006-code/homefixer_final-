@@ -12,14 +12,25 @@ type Message = {
   content: string;
 };
 
-export default function AIChatAgent() {
+export default function AIChatAgent({ 
+  currentUser, 
+  userName, 
+  isPartner 
+}: { 
+  currentUser?: { uid: string; displayName?: string | null } | null; 
+  userName?: string | null; 
+  isPartner?: boolean; 
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "ai", content: "Hi there! I'm your Home Fixer Support AI. How can I assist you today and make your Day usefull?" }
+    { 
+      role: "ai", 
+      content: `Hi ${userName || 'there'}! I'm your HomeFixer Agent. I can help you book services, manage your profile, or give you step-by-step instructions to fix home problems. How can I help you today?` 
+    }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [providers, setProviders] = useState<any[]>([]);
+  const [providers, setProviders] = useState<{ id: string; name: string; category: string; subCategory?: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -58,6 +69,7 @@ export default function AIChatAgent() {
       try {
         await addDoc(collection(db, "chats"), {
           role: "user",
+          uid: currentUser?.uid || "guest",
           content: userMessage,
           createdAt: serverTimestamp(),
         });
@@ -70,24 +82,42 @@ export default function AIChatAgent() {
 
       const genAI = new GoogleGenerativeAI(apiKey);
       const providersList = providers.map(p => `- ${p.name} (Category: ${p.category}, Specialization: ${p.subCategory || 'General'}): [PROVIDER_ID: ${p.id}]`).join("\n");
-      let model = genAI.getGenerativeModel({
-        model: "gemma-3-12b-it",
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
       });
 
-      const systemInstruction = `You are a helpful, professional customer support agent for Home Fixer. 
-We offer the following services in Durgapur: Electrician, Plumber, Mechanic, Tutor, Tailor.
-Here is the list of our current available service providers:
+      const systemInstruction = `You are the ultimate HomeFixer Support Agent, a helpful, professional AI assistant for residents and professionals in Durgapur.
+
+CURRENT USER CONTEXT:
+- Name: ${userName || 'Guest'}
+- Logged In: ${currentUser ? 'Yes' : 'No'}
+- User Type: ${isPartner ? 'Service Provider (Partner)' : 'Regular Customer'}
+- UID: ${currentUser?.uid || 'N/A'}
+
+YOUR CAPABILITIES & RULES:
+
+1. SERVICE BOOKING (Users Only):
+   - Categories: Electrician, Plumber, Mechanic, Tutor, Tailor.
+   - Available Providers:
 ${providersList}
+   - STEPS: First, ask for the specific problem/specialization. Then, suggest 1-2 matches from the list. 
+   - FINAL STEP: Once a choice is made, append: [REDIRECT: /provider?id=PROVIDER_ID].
 
-Follow these rules when interacting with users:
-1. If the user asks for advice on how to do something themselves (DIY) or asks a general "how to" question (e.g., "how can I fix a leaky pipe on my own?"), you MUST provide helpful, step-by-step instructions or advice to solve their problem directly. At the end, you may gently offer to connect them with a professional if they need further assistance.
-2. If the user asks to hire someone or asks for a general category (like "I need a mechanic" or "plumber"), ALWAYS ask them first about their specific area of specialization or what exactly they need (e.g., "Are you looking for a car or bike mechanic?"). DO NOT suggest providers yet.
-3. Once the user provides their specialization or specific need to hire someone, suggest 1 or 2 specific providers from the list above whose Category and Specialization best match their need. Ask them which one they'd like to be connected with.
-4. Once the user explicitly selects a provider from your suggestions, confirm their choice and you MUST append the special redirect tag at the very end of your response exactly like this: [REDIRECT: /provider?id=PROVIDER_ID] where PROVIDER_ID is the exact ID of the chosen provider from the list.
+2. DIY FIXING INSTRUCTIONS (Problem Solving):
+   - If a user asks "how to fix" something (e.g., leaky tap, fuse, fan noise), you MUST provide clear, safe, step-by-step DIY instructions immediately.
+   - SAFETY FIRST: Always start with a safety warning (e.g., "Turn off the main water/power first").
+   - Offer a professional only after providing the DIY steps.
 
-Example of Step 4: "Great! I'll connect you with Sujit Mandal right away." [REDIRECT: /provider?id=12345]
+3. PROFILE & ACCOUNT HELP:
+   - If asked about their profile or "who am I?", share their name and user type.
+   - To help them view/edit their profile, append: [REDIRECT: /profile].
+   - If a Partner asks how to see their business, append: [REDIRECT: /partner].
 
-Be concise, friendly, and very helpful. Do not make up providers not in the list. Ensure the redirect tag is formatted perfectly when it's time to redirect.`;
+4. PARTNER SUPPORT:
+   - Help Partners understand how to register or manage bookings.
+   - If they need to register as a partner, append: [REDIRECT: /register-partner].
+
+TONE: Friendly, professional, and extremely useful. Keep responses concise but thorough when giving instructions.`;
 
       const prompt = `System Instruction:\n${systemInstruction}\n\nConversation History:\n` + updatedMessages
         .map((m) => `${m.role === "user" ? "User" : "Agent"}: ${m.content}`)
@@ -101,16 +131,12 @@ Be concise, friendly, and very helpful. Do not make up providers not in the list
           result = await model.generateContent(prompt);
           aiResponseText = result.response.text();
           break;
-        } catch (e: any) {
-          if (e.message?.includes("503") && retries > 1) {
+        } catch (e) {
+          const apiError = e as { message?: string };
+          if (apiError.message?.includes("503") || apiError.message?.includes("429")) {
             retries--;
             await new Promise(r => setTimeout(r, 2000));
-          } else if (e.message?.includes("429") && retries > 1) {
-            retries--;
-            await new Promise(r => setTimeout(r, 2000));
-          } else {
-            throw e;
-          }
+          } else throw e;
         }
       }
 
@@ -127,6 +153,7 @@ Be concise, friendly, and very helpful. Do not make up providers not in the list
       try {
         await addDoc(collection(db, "chats"), {
           role: "ai",
+          uid: currentUser?.uid || "guest",
           content: aiResponseText || "Sorry, I couldn't generate a response.",
           createdAt: serverTimestamp(),
         });
@@ -140,9 +167,10 @@ Be concise, friendly, and very helpful. Do not make up providers not in the list
         setTimeout(() => {
           router.push(redirectUrl!);
           setIsOpen(false);
-        }, 2000);
+        }, 1500);
       }
-    } catch (error: any) {
+    } catch (error) {
+      console.error("AI Chat Error:", error);
       // In case of completely unexpected non-API errors
       setMessages((prev) => [
         ...prev,

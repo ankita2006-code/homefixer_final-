@@ -185,19 +185,10 @@ input:-webkit-autofill:active {
     top: 0;
     z-index: 50;
     width: 100%;
-    height: 76px;
-    background: rgba(250, 246, 240, 0.88);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-bottom: 1px solid rgba(212, 196, 176, 0.5);
-    transition: box-shadow 0.4s ease, background 0.4s ease;
-  }
-  .dark .uc-nav {
-    background: rgba(15, 26, 18, 0.92);
-    border-bottom-color: rgba(42, 61, 46, 0.6);
+    transition: box-shadow 0.4s ease, background 0.4s cubic-bezier(0.22, 1, 0.36, 1), backdrop-filter 0.4s ease;
   }
   .uc-nav.scrolled {
-    box-shadow: 0 4px 30px rgba(44, 58, 34, 0.10);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
   }
 
   /* ── Service / Provider cards ── */
@@ -584,6 +575,34 @@ input:-webkit-autofill:active {
 }
 .glass-tile:hover::before {
   left: 150%;
+}
+
+/* Liquid glass toggle button */
+.liquid-glass-toggle {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-md);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  color: var(--foreground);
+}
+.liquid-glass-toggle:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+.liquid-glass-toggle:active {
+  transform: translateY(0);
+}
+.dark .liquid-glass-toggle {
+  background: rgba(40, 50, 45, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.dark .liquid-glass-toggle:hover {
+  background: rgba(50, 65, 55, 0.5);
 }
 
 /* Blob decoration */

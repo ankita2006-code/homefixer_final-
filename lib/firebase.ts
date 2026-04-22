@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
+import { getFirestore, Firestore } from "firebase/firestore";
+import { getAuth, Auth } from "firebase/auth";
+import { getStorage, FirebaseStorage } from "firebase/storage";
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -15,9 +15,9 @@ const firebaseConfig = {
 const isConfigValid = firebaseConfig.apiKey && firebaseConfig.apiKey !== "your_api_key";
 
 let app;
-let db: any;
-let auth: any;
-let storage: any;
+let db: Firestore;
+let auth: Auth;
+let storage: FirebaseStorage;
 
 if (isConfigValid) {
   app = getApps().length ? getApp() : initializeApp(firebaseConfig);
@@ -30,12 +30,12 @@ if (isConfigValid) {
   db = { 
     collection: () => ({ doc: () => ({ onSnapshot: () => () => {} }) }),
     doc: () => ({ onSnapshot: () => () => {} }) 
-  };
+  } as unknown as Firestore;
   auth = { 
-    onAuthStateChanged: (cb: any) => { cb(null); return () => {}; },
+    onAuthStateChanged: (cb: (user: import("firebase/auth").User | null) => void) => { cb(null); return () => {}; },
     signOut: async () => {} 
-  };
-  storage = {};
+  } as unknown as Auth;
+  storage = {} as unknown as FirebaseStorage;
 }
 
 export { db, auth, storage };

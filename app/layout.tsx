@@ -159,45 +159,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* ─── NAVBAR ─── */}
         <nav
-          className={`uc-nav transition-shadow duration-300 ${scrolled ? "scrolled shadow-[0_4px_30px_rgba(44,58,34,0.10)]" : ""}`}
+          className={`sticky top-0 z-50 w-full h-[64px] transition-all duration-300 border-b border-black/5 dark:border-white/5 ${scrolled ? "bg-white/10 dark:bg-[#1B2B1E]/60 backdrop-blur-3xl shadow-lg" : "bg-white/5 dark:bg-[#1B2B1E]/30 backdrop-blur-xl shadow-none"}`}
           aria-label="Main navigation"
         >
           <div className="container mx-auto flex h-full items-center justify-between px-5 max-w-7xl">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 shrink-0 group" aria-label="Go to home">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0 group transition-transform hover:scale-105" aria-label="Go to home">
               <Logo className="w-9 h-9" />
               <div className="flex flex-col leading-none">
                 <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "1.1rem", color: "var(--foreground)" }}>
                   Home<span style={{ color: "var(--brand)" }}>Fixer</span>
                 </span>
-                <span className="text-[8px] font-semibold uppercase tracking-[0.15em]"
-                  style={{ color: "var(--muted)" }}>
-                  Trusted Professionals
+                <span className="text-[8px] font-bold uppercase tracking-[0.18em]"
+                  style={{ color: "var(--brand)" }}>
+                  Trusted Experts
                 </span>
               </div>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-6 px-4">
+            <div className="hidden lg:flex items-center gap-8 px-4">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="relative py-6 text-sm font-600 transition-colors duration-300 group"
+                    className="relative py-2 text-[13px] font-800 transition-all duration-300 group tracking-wider uppercase"
                     style={{
-                      color: isActive ? "var(--brand)" : "var(--foreground)",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        (e.currentTarget as HTMLElement).style.color = "var(--brand-mid)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        (e.currentTarget as HTMLElement).style.color = "var(--foreground)";
-                      }
+                      color: isActive ? (darkMode ? "#84CC16" : "var(--brand)") : (darkMode ? "#FFFFFF" : "var(--foreground)"),
+                      textShadow: darkMode ? "0 1px 2px rgba(0,0,0,0.5)" : "none"
                     }}
                   >
                     {link.label}
@@ -206,7 +197,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       style={{
                         background: "var(--brand)",
                         transform: isActive ? "scaleX(1)" : "scaleX(0)",
-                        transformOrigin: "center"
+                        transformOrigin: "left",
+                        boxShadow: isActive && darkMode ? "0 0 10px rgba(132, 204, 22, 0.4)" : "none"
                       }}
                     />
                   </Link>
@@ -219,7 +211,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {/* Dark Mode Toggle */}
               <button
                 onClick={toggleDarkMode}
-                className="p-2 transition-all duration-300"
+                className="w-10 h-10 blob flex items-center justify-center bg-black/5 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition-all duration-300 shadow-sm"
                 title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                 style={{ color: "var(--muted)", background: "var(--surface)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)" }}
                 onMouseEnter={(e) => {
@@ -257,10 +249,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </Link>
                 )
               ) : (
-                <Link href="/partner-login" className="text-sm font-600 transition-colors"
-                  style={{ color: "var(--muted)" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--brand)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}>
+                <Link href="/partner-login" className="text-sm font-800 transition-colors uppercase tracking-wide"
+                  style={{ color: darkMode ? "#FFFFFF" : "var(--foreground)", opacity: 0.9 }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--brand)"; (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = darkMode ? "#FFFFFF" : "var(--foreground)"; (e.currentTarget as HTMLElement).style.opacity = "0.9"; }}>
                   Partner Login
                 </Link>
               )}
@@ -301,19 +293,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="lg:hidden flex items-center gap-2">
               <button
                 onClick={toggleDarkMode}
-                className="p-2 transition-colors"
+                className="w-10 h-10 blob flex items-center justify-center bg-black/5 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition-all duration-300 shadow-sm"
                 title={darkMode ? "Light mode" : "Dark mode"}
-                style={{ color: "var(--muted)", background: "var(--surface)", borderRadius: "var(--radius-sm)" }}
               >
-                {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                {darkMode ? <Sun size={16} /> : <Moon size={16} />}
               </button>
               <button
-                className="p-2 transition-colors"
+                className="w-10 h-10 blob flex items-center justify-center bg-black/5 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition-all duration-300 shadow-sm"
                 onClick={() => setMobileOpen(!mobileOpen)}
                 aria-label="Toggle menu"
-                style={{ color: "var(--foreground)" }}
               >
-                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+                {mobileOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
             </div>
           </div>{/* end navbar container */}
@@ -322,7 +312,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {mobileOpen && (
             <div
               className="lg:hidden border-t px-5 py-6 flex flex-col gap-2 animate-fadeIn"
-              style={{ background: "var(--background)", borderColor: "var(--border)" }}
+              style={{
+                background: "var(--background)",
+                borderColor: "var(--border)",
+                backgroundColor: "rgba(var(--background-rgb, 250, 246, 240), 0.85)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
+              }}
             >
               {navLinks.map((link) => (
                 <Link
@@ -331,7 +327,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   className="px-4 py-3 text-sm font-600 transition-all duration-250"
                   style={{
                     color: pathname === link.href ? "var(--brand)" : "var(--foreground)",
-                    background: pathname === link.href ? "var(--brand-light)" : undefined,
+                    background: pathname === link.href ? "var(--brand-light)" : "transparent",
                     fontWeight: 600,
                     borderRadius: "var(--radius-md)",
                   }}
@@ -370,7 +366,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
 
-        <AIChatAgent />
+        <AIChatAgent
+          currentUser={user}
+          userName={dbUserName || user?.displayName}
+          isPartner={isPartner}
+        />
 
         {/* ─── FOOTER ─── */}
         <footer style={{
