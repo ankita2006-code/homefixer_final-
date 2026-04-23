@@ -46,7 +46,7 @@ export default function AIChatAgent({
     const fetchProviders = async () => {
       try {
         const snap = await getDocs(collection(db, "providers"));
-        setProviders(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        setProviders(snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as { id: string; name: string; category: string; subCategory?: string })));
       } catch (e) {
         console.error("Failed to load providers for chat", e);
       }
